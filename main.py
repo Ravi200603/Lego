@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import random
+
 # list of colours that are offered as lego pieces referneces https://rebrickable.com/colors/
 lego_colors_list = [
     [1, "Black", [5, 19, 29]],
@@ -80,9 +81,7 @@ def kcluster_color(img, k=15):
     return result
 
 # Converting the image into a pixelated form but processes image a bit first
-def pixelate(image_path, scale=0.04):
-    img = cv2.imread(image_path)
-
+def pixelate(img, scale=0.04):
     img = cv2.convertScaleAbs(img, alpha=1.5, beta=-25) #contrast increase
 
     img = cv2.bilateralFilter(img, 9, 75, 75) #blur
@@ -155,17 +154,6 @@ def filter_colors(img):
                 new_img[row][col] = most_common
 
     return new_img
-
-img_low_res, edges = pixelate('owl.jpg')
-edges_small = cv2.resize(edges, (32, 32))
-
-final_img = lego_maker(img_low_res)
-final_img = filter_colors(final_img)
-# all the Unique colors present in image to make generations easier and faster 
-#uniqueColors = [[b,g,r], [b,g,r] .... length(n-2) , [b,g,r]]
-unique_colors = np.unique(final_img.reshape(-1, 3), axis=0)
-
-# cv2.imwrite("SimplifiedColorsImage.jpg" ,final_img)
 
 
 def create_genome(unique_colors, size=1024):
@@ -260,34 +248,50 @@ def create_next_gen(scored_pop, unique_colors):
         new_gen.append(child)
     return new_gen
 
-num_generations = 6000
-current_population = create_population(100, unique_colors)
-print("Starting Evoulation please wait.")
+def run_generator(img):
+    img_low_res, edges = pixelate(img)
+    edges_small = cv2.resize(edges, (32, 32))
 
-for gen in range(num_generations):
-    #scoring everyone here
-    scored_pop = []
-    for individual in current_population:
-        score = get_fitness(individual, final_img, unique_colors)
-        scored_pop.append((score, individual))
-    #sorting the scored_population
-    scored_pop.sort(key=lambda x: x[0])
-    #UserFeedback so that they know code is running 
-    if gen % 500 == 0:
-        print(f"Generation {gen} & Current Error: {scored_pop[0][0]}")
-    #Creat Next Generation
-    current_population = create_next_gen(scored_pop, unique_colors)
+    final_img = lego_maker(img_low_res)
+    final_img = filter_colors(final_img)
+    # all the Unique colors present in image to make generations easier and faster
+    # uniqueColors = [[b,g,r], [b,g,r] .... length(n-2) , [b,g,r]]
+    unique_colors = np.unique(final_img.reshape(-1, 3), axis=0)
 
-# Final Preview of Results
-print("Evolution finished!")
-best_genome = scored_pop[0][1]
-final_result_img = np.zeros((32, 32, 3), dtype=np.uint8)
-for i in range(1024):
-    row = i//32
-    col = i%32
-    b, g, r = unique_colors[best_genome[i]]
-    final_result_img[row, col] = [b, g, r]
+    # cv2.imwrite("SimplifiedColorsImage.jpg" ,final_img)
 
-big_final = cv2.resize(final_result_img, (400, 400), interpolation=cv2.INTER_NEAREST)
-cv2.imwrite("FinalResults.jpg", big_final)
-cv2.imwrite("ProcessedImage.jpg", cv2.resize(final_img, (400, 400), interpolation=cv2.INTER_NEAREST))
+    num_generations = 2000
+    current_population = create_population(100, unique_colors)
+    print("Starting Evoulation please wait.")
+
+    best_genome = None
+
+    for gen in range(num_generations):
+        # scoring everyone here
+        scored_pop = []
+        for individual in current_population:
+            score = get_fitness(individual, final_img, unique_colors)
+            scored_pop.append((score, individual))
+        # sorting the scored_population
+        scored_pop.sort(key=lambda x: x[0])
+        # UserFeedback so that they know code is running
+        if gen % 500 == 0:
+            print(f"Generation {gen} & Current Error: {scored_pop[0][0]}")
+        # Creat Next Generation
+        current_population = create_next_gen(scored_pop, unique_colors)
+
+        # Final Preview of Results
+        print("Evolution finished!")
+        best_genome = scored_pop[0][1]
+    final_result_img = np.zeros((32, 32, 3), dtype=np.uint8)
+    for i in range(1024):
+        row = i // 32
+        col = i % 32
+        b, g, r = unique_colors[best_genome[i]]
+        final_result_img[row, col] = [b, g, r]
+
+    big_final = cv2.resize(final_result_img, (400, 400), interpolation=cv2.INTER_NEAREST)
+    #cv2.imwrite("FinalResults.jpg", big_final)
+    #cv2.imwrite("ProcessedImage.jpg", cv2.resize(final_img, (400, 400), interpolation=cv2.INTER_NEAREST))
+    final_img = cv2.resize(final_img, (400, 400), interpolation=cv2.INTER_NEAREST)
+    return final_img
