@@ -260,7 +260,7 @@ def run_generator(img):
 
     # cv2.imwrite("SimplifiedColorsImage.jpg" ,final_img)
 
-    num_generations = 2000
+    num_generations = 5
     current_population = create_population(100, unique_colors)
     print("Starting Evoulation please wait.")
 
@@ -295,3 +295,4 @@ def run_generator(img):
     #cv2.imwrite("ProcessedImage.jpg", cv2.resize(final_img, (400, 400), interpolation=cv2.INTER_NEAREST))
     final_img = cv2.resize(final_img, (400, 400), interpolation=cv2.INTER_NEAREST)
     return final_img
+
