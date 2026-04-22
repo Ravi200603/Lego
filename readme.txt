@@ -27,8 +27,8 @@ Ui Version requries to run two server 1st for the react page and 2nd for the fla
     b. once you are in Lego folder type 
     python server.py 
 
-    now you both the servers are ready and now you can go to this address 
-    http://localhost:5174/
+    now both the servers are ready and now you can go to this address 
+    http://localhost:5173/
     Note: Port number might be different here please check it from the front_end termainl 
 
     After oping this image you can add image from this file itself or your choice and click on upload button
