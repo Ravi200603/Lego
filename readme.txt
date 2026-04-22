@@ -5,7 +5,7 @@ The Program can we run by two types
    a. Go inside Lego folder and run the main_terminal.py
    b. wait until the its generating the images on the terminal
    c. Once Completed FinalResults.jpg named file will be saved in the files 
-   d. Open it see the preview of final image & error and all could be seen directly at the terminal itself
+   d. Open it and see the preview of final image & error and all could be seen directly at the terminal itself
 
 2) Ui Version
 Ui Version requries to run two server 1st for the react page and 2nd for the flask for backend.
