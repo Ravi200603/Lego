@@ -260,7 +260,7 @@ def run_generator(img):
 
     # cv2.imwrite("SimplifiedColorsImage.jpg" ,final_img)
 
-    num_generations = 5
+    num_generations = 10000
     current_population = create_population(100, unique_colors)
     print("Starting Evoulation please wait.")
 
